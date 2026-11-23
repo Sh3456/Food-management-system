@@ -8,7 +8,7 @@ export default function AdminDashboard() {
 
     const fetchData = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/price-comparison');
+            const res = await axios.get('http://127.0.0.1:5000/price-comparison');
             setPrices(res.data);
         } catch (err) {
             console.error(err);

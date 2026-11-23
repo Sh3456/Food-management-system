@@ -7,7 +7,7 @@ const GraphVisualization = () => {
 
     useEffect(() => {
         // Fetch graph data from AI Service
-        fetch('http://localhost:8000/api/ml/graph-data')
+        fetch('http://127.0.0.1:8000/api/ml/graph-data')
             .then(res => res.json())
             .then(data => {
                 if (data.nodes && data.links) {

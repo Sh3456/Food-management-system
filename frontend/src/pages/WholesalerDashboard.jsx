@@ -20,11 +20,11 @@ export default function WholesalerDashboard() {
 
     const fetchData = async () => {
         try {
-            const farmersRes = await axios.get(`http://localhost:5000/wholesaler/farmers${regionFilter ? `?city=${regionFilter}` : ''}`);
+            const farmersRes = await axios.get(`http://127.0.0.1:5000/wholesaler/farmers${regionFilter ? `?city=${regionFilter}` : ''}`);
             setFarmersStock(farmersRes.data);
-            const myRes = await axios.get('http://localhost:5000/wholesaler/stock');
+            const myRes = await axios.get('http://127.0.0.1:5000/wholesaler/stock');
             setMyStock(myRes.data);
-            const citiesRes = await axios.get('http://localhost:5000/cities');
+            const citiesRes = await axios.get('http://127.0.0.1:5000/cities');
             setCities(citiesRes.data.filter(c => c.source === 'farmer'));
         } catch (err) {
             console.error(err);
@@ -42,7 +42,7 @@ export default function WholesalerDashboard() {
 
     const handleConfirmPurchase = async (qty, markup) => {
         try {
-            await axios.post('http://localhost:5000/wholesaler/buy', {
+            await axios.post('http://127.0.0.1:5000/wholesaler/buy', {
                 crop_id: selectedItem.crop_id,
                 quantity: parseFloat(qty),
                 selling_price: parseFloat(markup)

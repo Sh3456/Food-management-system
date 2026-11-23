@@ -27,15 +27,15 @@ const AIDashboard = () => {
         const fetchInsights = async () => {
             try {
                 // Fetch bottlenecks
-                const botRes = await fetch('http://localhost:8000/api/ml/bottlenecks');
+                const botRes = await fetch('http://127.0.0.1:8000/api/ml/bottlenecks');
                 if (botRes.ok) setBottlenecks(await botRes.json());
 
                 // Fetch anomalies
-                const anomRes = await fetch('http://localhost:8000/api/ml/anomalies');
+                const anomRes = await fetch('http://127.0.0.1:8000/api/ml/anomalies');
                 if (anomRes.ok) setAnomalies(await anomRes.json());
 
                 // For demo, fetch recommendations for Retailer ID 1
-                const recRes = await fetch('http://localhost:8000/api/ml/recommend-supplier/1');
+                const recRes = await fetch('http://127.0.0.1:8000/api/ml/recommend-supplier/1');
                 if (recRes.ok) setRecommendations(await recRes.json());
             } catch (error) {
                 console.error("Error fetching AI Insights:", error);

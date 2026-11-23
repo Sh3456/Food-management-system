@@ -21,9 +21,9 @@ export default function FarmerDashboard() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const pRes = await axios.get('http://localhost:5000/farmer/production');
+            const pRes = await axios.get('http://127.0.0.1:5000/farmer/production');
             setProduction(pRes.data);
-            const cRes = await axios.get('http://localhost:5000/crops');
+            const cRes = await axios.get('http://127.0.0.1:5000/crops');
             setCrops(cRes.data);
         } catch (err) {
             console.error('Fetch error:', err);
@@ -39,7 +39,7 @@ export default function FarmerDashboard() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/farmer/add-production', formData);
+            await axios.post('http://127.0.0.1:5000/farmer/add-production', formData);
             alert('Production added successfully!');
             setFormData({
                 crop_id: '',

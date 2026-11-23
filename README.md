@@ -20,38 +20,13 @@ This project is a comprehensive Full-Stack Food Supply Chain Management system t
 
 ## Setup & Running Locally
 
-### 1. Database Setup
-Ensure MySQL is running. The database connects to `localhost` root with an empty password by default (configurable in `.env`). The schema is located in `database/schema.sql`.
+1. Start MySQL 8. From the MySQL client, apply `database/schema.sql` to create a fresh `smart_food_supply` database. The schema file is for a new database.
+2. Copy `backend/.env.example` to `backend/.env`. Set the database connection values and generate a unique `JWT_SECRET`, for example with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
+3. In a VS Code terminal in `backend`, run `npm ci`, `node apply_overhaul.js`, and optionally `node seed.js` on a fresh schema to load demo records. Then run `npm start`.
+4. In a second terminal in `frontend`, run `npm ci` and `npm run dev -- --host 127.0.0.1`. Open the Vite URL, normally `http://127.0.0.1:5173`. With demo data, `farmer_1@demo.com` can sign in using `password123`.
+5. In a third terminal in `ai_service`, create a Python virtual environment and install `requirements.txt`. Run `python -m uvicorn main:app --host 127.0.0.1 --port 8000` using that environment. The Python service reads the same database configuration as the Node backend. The dashboard is at `http://127.0.0.1:5173/ai-dashboard`.
 
-### 2. Run Node.js Backend
-```bash
-cd backend
-npm install
-npm run start
-```
-Runs on `http://localhost:5000`
-
-### 3. Run Python ML Service
-```bash
-cd ai_service
-python -m venv venv
-# Activate venv
-.\venv\Scripts\Activate.ps1   # Windows
-# Install ML dependencies
-pip install -r requirements.txt
-# Run FastAPI server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-Runs on `http://localhost:8000`. API Docs available at `http://localhost:8000/docs`.
-
-### 4. Run React Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Runs on `http://localhost:5173`.
-Navigate to `/ai-dashboard` to view the Machine Learning insights!
+The supplier recommendations are a demonstration using an untrained model.
 
 ## Documentation
 - [Architecture Diagram](./docs/Architecture_Diagram.md)

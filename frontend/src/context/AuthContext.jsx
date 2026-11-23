@@ -22,8 +22,10 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
+    const signup = (formData) => axios.post('http://127.0.0.1:5000/auth/signup', formData);
+
     const login = async (email, password) => {
-        const response = await axios.post('http://localhost:5000/auth/login', { email, password });
+        const response = await axios.post('http://127.0.0.1:5000/auth/login', { email, password });
         const { token, role, entityId, name } = response.data;
         
         localStorage.setItem('token', token);
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, signup, login, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

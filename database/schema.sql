@@ -65,12 +65,14 @@ CREATE TABLE WHOLESALER_STOCK (
     quantity_kg DECIMAL(10,2) NOT NULL,
 
     -- mapped from CSV
-    purchase_date DATE,
+    harvest_date DATE,
     expiry_date DATE,
 
-    purchase_price DECIMAL(10,2),
-    selling_price DECIMAL(10,2),
+    purchase_price_per_kg DECIMAL(10,2),
+    selling_price_per_kg DECIMAL(10,2),
 
+    source_farmer_id INT,
+    FOREIGN KEY (source_farmer_id) REFERENCES FARMER(id),
     FOREIGN KEY (wholesaler_id) REFERENCES WHOLESALER(id),
     FOREIGN KEY (crop_id) REFERENCES CROP(id)
 );
@@ -83,12 +85,14 @@ CREATE TABLE RETAIL_STOCK (
     quantity_kg DECIMAL(10,2) NOT NULL,
 
     -- since CSV doesn't provide these properly
-    purchase_date DATE,
+    harvest_date DATE,
     expiry_date DATE,
 
-    cost_price DECIMAL(10,2),
-    selling_price DECIMAL(10,2),
+    purchase_price_per_kg DECIMAL(10,2),
+    selling_price_per_kg DECIMAL(10,2),
 
+    source_wholesaler_id INT,
+    FOREIGN KEY (source_wholesaler_id) REFERENCES WHOLESALER(id),
     FOREIGN KEY (retailer_id) REFERENCES RETAILER(id),
     FOREIGN KEY (crop_id) REFERENCES CROP(id)
 );
@@ -101,4 +105,31 @@ CREATE TABLE EXPIRY_ALERTS (
     alert_type ENUM('FRESH', 'NEAR_EXPIRY', 'EXPIRED') NOT NULL,
     days_left INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE PRODUCTION (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    farmer_id INT NOT NULL,
+    crop_id INT NOT NULL,
+    quantity_kg DECIMAL(10,2) NOT NULL,
+    remaining_quantity DECIMAL(10,2) NOT NULL,
+    harvest_date DATE NOT NULL,
+    expiry_date DATE NOT NULL,
+    price_per_kg DECIMAL(10,2) NOT NULL,
+    region VARCHAR(100),
+    UNIQUE KEY idx_prod_unique (farmer_id, crop_id, harvest_date, expiry_date),
+    FOREIGN KEY (farmer_id) REFERENCES FARMER(id),
+    FOREIGN KEY (crop_id) REFERENCES CROP(id)
+);
+
+CREATE TABLE TRANSACTIONS (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    wholesaler_id INT NOT NULL,
+    farmer_id INT NOT NULL,
+    crop_id INT NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    transaction_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (wholesaler_id) REFERENCES WHOLESALER(id),
+    FOREIGN KEY (farmer_id) REFERENCES FARMER(id),
+    FOREIGN KEY (crop_id) REFERENCES CROP(id)
 );

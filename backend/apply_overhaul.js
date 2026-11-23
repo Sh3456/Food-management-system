@@ -7,6 +7,7 @@ async function applyOverhaul() {
     console.log('--- Database Overhaul Process Started ---');
     const connection = await mysql.createConnection({
         host: process.env.DB_HOST || 'localhost',
+        port: Number(process.env.DB_PORT || 3306),
         user: process.env.DB_USER || 'root',
         password: process.env.DB_PASSWORD || '',
         database: process.env.DB_NAME || 'smart_food_supply',
@@ -24,7 +25,7 @@ async function applyOverhaul() {
         console.log('✅ SUCCESS: Database overhaul applied successfully!');
     } catch (err) {
         console.error('❌ ERROR applying overhaul:');
-        console.error(err.message);
+        process.exitCode = 1; console.error(err.message);
         if (err.sql) {
             console.error('Offending SQL around: ', err.sql.substring(0, 100) + '...');
         }

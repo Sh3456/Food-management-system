@@ -6,7 +6,7 @@ export default function AlertsPanel() {
 
     const fetchAlerts = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/alerts');
+            const res = await axios.get('http://127.0.0.1:5000/alerts');
             setAlerts(res.data);
         } catch (err) {
             console.error('Error fetching alerts:', err);
