@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if signup else 'Sign in' }} · Food Management System{% endblock %}
+{% block content %}
+<section class="card auth">
+  <h1>{{ 'Create an account' if signup else 'Sign in' }}</h1>
+  <form method="post" class="fields">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    {% if signup %}
+    <label>Name <input name="name" required maxlength="255" value="{{ request.form.get('name', '') }}"></label>
+    <label>Role
+      <select name="role" required>
+        {% for role in ['FARMER', 'WHOLESALER', 'RETAILER'] %}
+        <option value="{{ role }}" {{ 'selected' if request.form.get('role') == role }}>{{ role|title }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="grid two">
+      <label>City <input name="city" maxlength="100" value="{{ request.form.get('city', '') }}"></label>
+      <label>State <input name="state" maxlength="100" value="{{ request.form.get('state', '') }}"></label>
+    </div>
+    <label>Contact number <input type="tel" name="contact" maxlength="20" value="{{ request.form.get('contact', '') }}"></label>
+    {% endif %}
+    <label>Email <input type="email" name="email" required maxlength="255" autocomplete="username" value="{{ request.form.get('email', '') }}"></label>
+    <label>Password <input type="password" name="password" required maxlength="128" {% if signup %}minlength="8" autocomplete="new-password"{% else %}autocomplete="current-password"{% endif %}></label>
+    <button>{{ 'Create account' if signup else 'Sign in' }}</button>
+  </form>
+  {% if signup %}
+  <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a>.</p>
+  {% else %}
+  <p>New to the system? <a href="{{ url_for('signup') }}">Create an account</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

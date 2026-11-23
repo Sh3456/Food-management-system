@@ -1,36 +1,41 @@
-# AI-Powered Food Supply Chain Management System
+# Food Management System
 
-This project is a comprehensive Full-Stack Food Supply Chain Management system transformed into an AI-powered intelligence platform. It tracks transactions and interactions between Farmers, Wholesalers, and Retailers, and uses advanced Machine Learning to optimize the supply chain.
+A DBMS project with a Flask application, server-rendered HTML/CSS, and MySQL. HTML forms go directly to Flask routes. Flask reads and writes MySQL, then renders the page.
 
-## Features
-- **Role-Based Dashboards**: Tailored views for Farmers, Wholesalers, Retailers, and Admins.
-- **Real-Time Inventory Management**: Tracks crop stock, shelf life, and dynamic pricing.
-- **Graph Neural Network (GNN) AI Intelligence**:
-  - **Supplier Recommendation**: Predicts the best Wholesaler for a Retailer using Link Prediction (GraphSAGE).
-  - **Bottleneck Detection**: Identifies critical points of failure in the supply chain using graph centrality.
-  - **Anomaly Detection**: Monitors irregular patterns in purchasing and distribution.
-- **AI Interactive Dashboard**: Implemented in React, featuring real-time insights and a D3 Force-Graph visualization of the entire supply chain network.
+## Run in VS Code
 
-## Technology Stack
-- **Frontend**: React.js, Tailwind CSS, Recharts, React-Force-Graph-2D, Lucide-React
-- **Backend (CRUD)**: Node.js, Express
-- **Backend (ML Microservice)**: Python, FastAPI
-- **Machine Learning**: PyTorch Geometric, scikit-learn, networkx, pandas
-- **Database**: MySQL
+On Windows, open this folder in VS Code. Install Python and MySQL Server 8 for a new machine. From the project terminal, set up the Python environment once:
 
-## Setup & Running Locally
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
-1. Start MySQL 8. From the MySQL client, apply `database/schema.sql` to create a fresh `smart_food_supply` database. The schema file is for a new database.
-2. Copy `backend/.env.example` to `backend/.env`. Set the database connection values and generate a unique `JWT_SECRET`, for example with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
-3. In a VS Code terminal in `backend`, run `npm ci`, `node apply_overhaul.js`, and optionally `node seed.js` on a fresh schema to load demo records. Then run `npm start`.
-4. In a second terminal in `frontend`, run `npm ci` and `npm run dev -- --host 127.0.0.1`. Open the Vite URL, normally `http://127.0.0.1:5173`. With demo data, `farmer_1@demo.com` can sign in using `password123`.
-5. In a third terminal in `ai_service`, create a Python virtual environment and install `requirements.txt`. Run `python -m uvicorn main:app --host 127.0.0.1 --port 8000` using that environment. The Python service reads the same database configuration as the Node backend. The dashboard is at `http://127.0.0.1:5173/ai-dashboard`.
+Start the app:
 
-The supplier recommendations are a demonstration using an untrained model.
+```powershell
+python .\run_local.py
+```
 
-## Documentation
-- [Architecture Diagram](./docs/Architecture_Diagram.md)
-- [ML Pipeline Diagram](./docs/ML_Pipeline_Diagram.md)
-- [Database Diagram](./docs/Database_Diagram.md)
-- [Model Explanation](./docs/Model_Explanation.md)
-- [API Documentation](./docs/API_Documentation.md)
+Open `http://127.0.0.1:5173`. Keep the terminal open. Press Ctrl+C to stop Flask and its local MySQL instance. You can also select **Terminal → Run Task → Run food management locally** in VS Code.
+
+The launcher starts a loopback-only MySQL instance on port 3307, initializes the database when needed, and reuses the existing project database when present. Set `MYSQL_BIN` if MySQL is installed in another directory. For an already-running MySQL instance, set `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, and optionally `DB_NAME` in your terminal, then run `python run_local.py --external-mysql`. First-time setup needs permission to create the project schema, views, procedures and triggers.
+
+## Demonstrate the project
+
+Demo accounts are `farmer_1@demo.com`, `wholesaler_1@demo.com`, and `retailer_1@demo.com`. The demo password is `password123`. You can also register your own accounts.
+
+1. Sign in as a farmer and add an unexpired crop batch.
+2. Sign in as a wholesaler, buy some of that crop, and check the wholesaler inventory.
+3. Sign in as a retailer and buy from the corresponding wholesaler batch.
+4. Open **SQL analysis** to compare current prices, review expiring stock, and see recent farmer-to-wholesaler transactions.
+
+## Where the SQL lives
+
+| File | What to show |
+| --- | --- |
+| `database/schema.sql` | Tables, primary keys, foreign keys, and constraints |
+| `database/schema_updates.sql` | Pricing and expiry views, add and purchase procedures, and purchase-alert triggers |
+| `database/analysis.sql` | Lowest current price by crop at each supply chain stage |
+| `app.py` | Flask form handling and the queries for the inventory and analysis pages |
+| `db.py` | The MySQL connection and helpers for running parameterized queries and procedures |

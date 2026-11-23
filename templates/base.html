@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Food Management System{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="site-header">
+  <div class="shell nav">
+    <a class="brand" href="{{ url_for('home') }}">Food Management System</a>
+    {% if g.user %}
+    <nav aria-label="Main navigation">
+      {% if g.user.role != 'ADMIN' %}<a href="{{ url_for('dashboard') }}">Inventory</a>{% endif %}
+      <a href="{{ url_for('analysis') }}">SQL analysis</a>
+      <form method="post" action="{{ url_for('logout') }}">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <button class="secondary">Sign out</button>
+      </form>
+    </nav>
+    {% endif %}
+  </div>
+</header>
+<main class="shell">
+  {% for message in get_flashed_messages() %}<p class="notice" role="status">{{ message }}</p>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

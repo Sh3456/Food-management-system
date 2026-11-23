@@ -1,0 +1,37 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; color: #18332a; background: #f3f6ef; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #126045; }
+.site-header { background: #133d30; color: white; }
+.site-header a { color: white; }
+.shell { width: min(94%, 74rem); margin: auto; }
+.nav, nav, .inline { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.nav { justify-content: space-between; padding: 1rem 0; }
+.brand { font-weight: 750; text-decoration: none; }
+main { padding: 2rem 0 4rem; }
+h1 { margin: 0 0 .5rem; font-size: clamp(1.9rem, 4vw, 2.8rem); }
+h2 { margin: 0 0 .85rem; font-size: 1.3rem; }
+.muted { color: #4b655a; }
+.card, .notice { border: 1px solid #d5e0d6; background: white; border-radius: .8rem; padding: clamp(1rem, 3vw, 1.6rem); margin: 1.25rem 0; }
+.notice { background: #e6f4e7; }
+.auth { max-width: 29rem; margin: 1rem auto; }
+.fields, .grid { display: grid; gap: .9rem; }
+.grid { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); align-items: end; }
+.two { grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); }
+label { display: grid; gap: .35rem; font-weight: 600; }
+input, select, button { font: inherit; min-height: 2.55rem; border-radius: .4rem; }
+input, select { border: 1px solid #9eb1a6; padding: .45rem .55rem; width: 100%; background: white; color: inherit; }
+button { background: #176347; color: white; border: 1px solid transparent; padding: .45rem .8rem; font-weight: 650; cursor: pointer; }
+button:hover { background: #104832; }
+button.secondary { background: white; color: #174b36; border-color: #9eb1a6; }
+:focus-visible { outline: 3px solid #2a8b76; outline-offset: 2px; }
+.inline { align-items: end; gap: .5rem; }
+.purchase { min-width: 16rem; flex-wrap: nowrap; font-size: .86rem; }
+.purchase input { min-width: 4.2rem; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; text-align: left; }
+th, td { padding: .65rem .7rem; border-bottom: 1px solid #e0e8e0; vertical-align: middle; }
+th { background: #eaf2e9; white-space: nowrap; }
+.alerts { padding-left: 1.2rem; }
+.alerts li { margin-bottom: .55rem; }
+time { color: #4b655a; font-size: .85rem; display: block; }

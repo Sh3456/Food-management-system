@@ -161,19 +161,30 @@ BEGIN
     DECLARE v_e_date DATE;
     DECLARE v_deduct DECIMAL(10,2);
     DECLARE v_done INT DEFAULT FALSE;
+    DECLARE v_locked_crop INT;
     
     DECLARE cur CURSOR FOR 
         SELECT id, quantity_kg, farmer_id, discounted_price, harvest_date, expiry_date 
         FROM v_production_pricing 
-        WHERE crop_id = p_crop_id AND quantity_kg > 0 
-        ORDER BY expiry_date ASC;
+        WHERE crop_id = p_crop_id AND quantity_kg > 0 AND expiry_date >= CURDATE() 
+        ORDER BY expiry_date ASC, id ASC;
         
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_done = TRUE;
     DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;
 
     START TRANSACTION;
 
-    IF (SELECT COALESCE(SUM(remaining_quantity),0) FROM PRODUCTION WHERE crop_id = p_crop_id) < p_quantity THEN
+    IF p_quantity IS NULL OR p_quantity <= 0 OR p_selling_price IS NULL OR p_selling_price <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Quantity and resale price must be positive';
+    END IF;
+
+    SELECT id INTO v_locked_crop FROM CROP WHERE id = p_crop_id FOR UPDATE;
+    IF v_locked_crop IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Crop not found';
+    END IF;
+
+    IF (SELECT COALESCE(SUM(remaining_quantity),0) FROM PRODUCTION
+        WHERE crop_id = p_crop_id AND expiry_date >= CURDATE()) < p_quantity THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient stock';
     END IF;
 
@@ -195,6 +206,9 @@ BEGIN
         SET v_remaining_to_buy = v_remaining_to_buy - v_deduct;
     END LOOP;
     CLOSE cur;
+    IF v_remaining_to_buy > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient stock';
+    END IF;
     COMMIT;
 END;
 
@@ -215,6 +229,10 @@ BEGIN
     
     DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;
 
+    IF p_quantity IS NULL OR p_quantity <= 0 OR p_selling_price IS NULL OR p_selling_price <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Quantity and resale price must be positive';
+    END IF;
+
     IF p_wholesaler_stock_id IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'wholesaler_stock_id cannot be null';
     END IF;
@@ -224,7 +242,7 @@ BEGIN
     SELECT quantity_kg, crop_id, harvest_date, expiry_date, wholesaler_id, discounted_price 
     INTO v_available_qty, v_crop_id, v_h_date, v_e_date, v_w_id, v_price
     FROM v_wholesaler_stock_pricing 
-    WHERE id = p_wholesaler_stock_id FOR UPDATE;
+    WHERE id = p_wholesaler_stock_id AND expiry_date >= CURDATE() FOR UPDATE;
     
     IF v_available_qty IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stock item not found';

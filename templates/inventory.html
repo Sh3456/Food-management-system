@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ g.user.role|title }} inventory · Food Management System{% endblock %}
+{% block content %}
+<h1>{{ g.user.role|title }} inventory</h1>
+<p class="muted">{{ g.user.name }}</p>
+{% if g.user.role == 'FARMER' %}
+<section class="card">
+  <h2>Add a crop batch</h2>
+  <form method="post" class="grid">
+    <input type="hidden" name="csrf" value="{{ session.csrf }}">
+    <label>Crop
+      <select name="crop_id" required>{% for crop in crops %}<option value="{{ crop.id }}">{{ crop.name }}</option>{% endfor %}</select>
+    </label>
+    <label>Quantity (kg) <input name="quantity" type="number" min="0.01" step="0.01" required></label>
+    <label>Price per kg <input name="price" type="number" min="0.01" step="0.01" required></label>
+    <label>Harvest date <input name="harvest" type="date" required></label>
+    <label>Expiry date <input name="expiry" type="date" required></label>
+    <button>Add batch</button>
+  </form>
+</section>
+{% endif %}
+<section class="card">
+  <h2>Your stock</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Crop</th><th>Quantity (kg)</th><th>Expiry</th><th>Status</th><th>Current price/kg</th></tr></thead>
+    <tbody>
+    {% for row in inventory %}
+    <tr><td>{{ row.crop_name }}</td><td>{{ row.quantity_kg }}</td><td>{{ row.expiry_date or '—' }}</td><td>{{ row.status }}</td><td>{{ '%.2f'|format(row.discounted_price) if row.discounted_price is not none else '—' }}</td></tr>
+    {% else %}
+    <tr><td colspan="5">Your inventory is empty.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% if g.user.role != 'FARMER' %}
+<section class="card">
+  <h2>{{ 'Farmer market' if g.user.role == 'WHOLESALER' else 'Wholesaler market' }}</h2>
+  {% if g.user.role == 'WHOLESALER' %}
+  <p class="muted">Orders are filled from available batches of the selected crop in earliest-expiry order.</p>
+  {% else %}
+  <form method="get" class="inline">
+    <label>City <input name="city" value="{{ city }}"></label><button class="secondary">Filter</button>
+    {% if city %}<a href="{{ url_for('dashboard') }}">Clear filter</a>{% endif %}
+  </form>
+  {% endif %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Crop</th><th>{{ 'Batches' if g.user.role == 'WHOLESALER' else 'Seller' }}</th><th>{{ 'Expiry order' if g.user.role == 'WHOLESALER' else 'City' }}</th><th>Available (kg)</th><th>Expiry</th><th>Price/kg</th><th>Purchase</th></tr></thead>
+    <tbody>
+    {% for row in market %}
+    <tr>
+      <td>{{ row.crop_name }}</td>
+      <td>{{ row.batches if g.user.role == 'WHOLESALER' else row.wholesaler_name }}</td>
+      <td>{{ 'Earliest first' if g.user.role == 'WHOLESALER' else (row.city or '—') }}</td><td>{{ row.quantity_kg }}</td><td>{{ row.expiry_date }}</td>
+      <td>{{ '%.2f'|format(row.discounted_price) if row.discounted_price is not none else '—' }}</td>
+      <td>
+        <form method="post" class="inline purchase">
+          <input type="hidden" name="csrf" value="{{ session.csrf }}">
+          {% if g.user.role == 'WHOLESALER' %}
+          <input type="hidden" name="crop_id" value="{{ row.crop_id }}">
+          {% else %}
+          <input type="hidden" name="stock_id" value="{{ row.id }}">
+          {% endif %}
+          <label>Qty (kg) <input name="quantity" type="number" min="0.01" step="0.01" required></label>
+          <label>Resale/kg <input name="price" type="number" min="0.01" step="0.01" required></label>
+          <button>Buy</button>
+        </form>
+      </td>
+    </tr>
+    {% else %}<tr><td colspan="7">No available stock matches this market.</td></tr>{% endfor %}
+    </tbody>
+  </table></div>
+</section>
+{% endif %}
+<section class="card">
+  <h2>Purchase alerts</h2>
+  {% if alerts %}
+  <ul class="alerts">{% for item in alerts %}<li>{{ item.message }} <time>{{ item.created_at }}</time></li>{% endfor %}</ul>
+  {% else %}<p>No purchase alerts yet.</p>{% endif %}
+</section>
+{% endblock %}

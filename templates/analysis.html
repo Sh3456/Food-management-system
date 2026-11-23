@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% macro price(value) %}{{ '%.2f'|format(value) if value is not none else '—' }}{% endmacro %}
+{% block title %}SQL analysis · Food Management System{% endblock %}
+{% block content %}
+<h1>SQL analysis</h1>
+<section class="card">
+  <h2>Price comparison by crop</h2>
+  <p class="muted">Lowest current price per kg among in-stock, unexpired batches at each stage.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Crop</th><th>Farmer</th><th>Wholesaler</th><th>Retailer</th></tr></thead>
+    <tbody>{% for row in comparisons %}<tr><td>{{ row.crop_name }}</td><td>{{ price(row.farmer_price) }}</td><td>{{ price(row.wholesaler_price) }}</td><td>{{ price(row.retailer_price) }}</td></tr>
+    {% else %}<tr><td colspan="4">No crops are configured.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+<section class="card">
+  <h2>Expiring and expired farmer stock</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Crop</th><th>Farmer</th><th>Quantity (kg)</th><th>Expiry</th><th>Days left</th><th>Status</th></tr></thead>
+    <tbody>{% for row in expiry %}<tr><td>{{ row.crop_name }}</td><td>{{ row.farmer_name }}</td><td>{{ row.quantity_kg }}</td><td>{{ row.expiry_date }}</td><td>{{ row.days_to_expiry }}</td><td>{{ row.status }}</td></tr>
+    {% else %}<tr><td colspan="6">No farmer stock expires within 30 days or is already expired.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+<section class="card">
+  <h2>Recent farmer-to-wholesaler purchases</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Time</th><th>Crop</th><th>Farmer</th><th>Wholesaler</th><th>Quantity (kg)</th><th>Price/kg</th><th>Total</th></tr></thead>
+    <tbody>{% for row in transactions %}<tr><td>{{ row.transaction_timestamp }}</td><td>{{ row.crop }}</td><td>{{ row.farmer }}</td><td>{{ row.wholesaler }}</td><td>{{ row.quantity }}</td><td>{{ price(row.price) }}</td><td>{{ price(row.total) }}</td></tr>
+    {% else %}<tr><td colspan="7">No purchases recorded yet.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</section>
+{% endblock %}
